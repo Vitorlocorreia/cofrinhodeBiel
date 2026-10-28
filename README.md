@@ -21,18 +21,13 @@ No projeto Vercel, use:
 - Build Command: `npm run build:vercel`.
 - Output Directory: `vercel-public`.
 
-Antes de ativar a conexão com o banco, configure **Settings → Deployment Protection → Vercel Authentication → All Deployments**. Verifique que o domínio de produção também exige o acesso do proprietário. Standard Protection protege apenas os endereços de prévia e não é suficiente para este histórico financeiro único. Não crie exceções públicas ou compartilhe links que ignorem essa proteção.
+O proprietário escolheu deixar o endereço Vercel aberto, sem autenticação. Em **Settings → Deployment Protection**, a exigência de login deve ficar desativada para permitir esse acesso. Qualquer pessoa que tenha o endereço poderá ler e alterar o mesmo histórico financeiro. Não há usuários separados.
 
-Depois de conferir a proteção, configure no ambiente Vercel, como valores privados:
+Configure `COFRE_GATEWAY_TOKEN` como segredo do servidor na Vercel e faça um novo deploy. Essa credencial nunca deve ser publicada no GitHub ou enviada ao navegador. A antiga variável `COFRE_PRIVATE_DEPLOYMENT` não é mais usada.
 
-- `COFRE_GATEWAY_TOKEN`: a mesma credencial privada de servidor já usada no Cofre. Nunca use uma variável com prefixo público e não publique esse valor no GitHub ou no chat.
-- `COFRE_PRIVATE_DEPLOYMENT`: `vercel-auth-all-deployments`. Este valor confirma a configuração de proteção; ele **não é autenticação por si só**. Só o habilite depois de verificar a proteção da plataforma. Sem ele, a função recusa a conexão com o banco.
+## Histórico único
 
-Faça um novo deploy após configurar as variáveis. O aplicativo usa o acesso da própria Vercel, sem cadastrar novos usuários no Cofre. Se o endereço continuar retornando HTTP 403 antes de exibir a interface, confira na conta proprietária os controles de acesso, as regras de firewall e os detalhes da implantação; o código da aplicação não pode remover uma restrição da hospedagem.
-
-## Histórico único e acesso privado
-
-Há um único histórico financeiro, sem Supabase Auth e sem cadastro de usuários. Em produção, o acesso usa a proteção privada já existente do Site. Não torne este Site público: o servidor compartilha um único histórico do Gabriel, e a proteção do Site é a fronteira de acesso da aplicação. O servidor local escuta apenas no endereço de loopback.
+Há um único histórico financeiro, sem Supabase Auth e sem cadastro de usuários. A publicação na Vercel fica aberta por escolha do proprietário. O endereço do Sites conserva sua própria configuração de acesso; o servidor local escuta apenas no endereço de loopback.
 
 O navegador chama `/api/cofre` no próprio endereço. O servidor autentica a chamada à função Supabase `cofre-gateway` com uma credencial privada. Apenas o hash SHA-256 dessa credencial fica no banco. A função usa os segredos administrativos fornecidos pelo próprio ambiente Supabase; eles nunca são enviados à interface.
 
