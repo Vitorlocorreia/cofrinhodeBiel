@@ -1,3 +1,9 @@
 node_modules/
 *.tar.gz
 *.zip
+.env*
+!.env.example
+dist/
+supabase/functions/cofre-gateway/state.mjs
+supabase/functions/cofre-gateway/core.mjs
+supabase/functions/cofre-gateway/schedules.mjs

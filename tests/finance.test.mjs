@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cents,validate,summary,opening,mergeImport} from '../dist/core.mjs';
+import {cents,validate,summary,opening,mergeImport} from '../web/core.mjs';
 const entry=(extra={})=>({id:'1',description:'Salário',date:'2026-10-05',competence:'2026-10',type:'receita',category:'Salário',amount:100000,status:'pago',account:'Conta principal',...extra});
 test('valores brasileiros e centavos são exatos',()=>{assert.equal(cents('1.234,56'),123456);assert.equal(cents(0.1),10);assert.throws(()=>cents('1,234'));assert.throws(()=>cents(-1));assert.throws(()=>cents('abc'));});
 test('caixa usa pagamento, DRE usa competência e inclui pendências',()=>{const rows=[entry(),entry({id:'2',type:'despesa',category:'Moradia',amount:30000,date:'2026-11-01'}),entry({id:'3',status:'pendente',amount:20000})];assert.equal(summary(rows,'2026-10').result,100000);assert.equal(summary(rows,'2026-10','competence',false).result,90000);});

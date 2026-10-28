@@ -1,12 +1,13 @@
 import {categories,accounts,today,money,cents,validate,summary,opening,sign,mergeImport} from './core.mjs';
 import {validatePlan,extendSchedules} from './schedules.mjs';
 import {createScheduleUI} from './schedules-ui.mjs';
+import {connectCloud} from './cloud.mjs';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const key='cofre-gabriel-v1';let entries=[],plans=[],page='overview',search='',typeFilter='',statusFilter='',pendingImport=null;let storageFailed=false;
+const key='cofre-gabriel-v1';let entries=[],plans=[],page='overview',search='',typeFilter='',statusFilter='',pendingImport=null;let storageFailed=false;let cloud=null;
 try{const raw=localStorage.getItem(key);if(raw){const data=JSON.parse(raw);if(![1,2].includes(data.version)||!Array.isArray(data.entries))throw Error();entries=data.entries.map(validate);plans=(data.version===2?data.plans:[]).map(validatePlan);}}catch{storageFailed=true;}
 $('#month').value=today().slice(0,7);
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,6000);}
-function persist(next,force=false,nextPlans=plans){if(storageFailed&&!force){toast('Restaure um backup antes de salvar: os dados antigos não puderam ser lidos.');return false;}try{localStorage.setItem(key,JSON.stringify({version:2,entries:next,plans:nextPlans}));entries=next;plans=nextPlans;storageFailed=false;render();return true;}catch{toast('Não foi possível salvar. Exporte um backup e confira o espaço do navegador.');return false;}}
+function persist(next,force=false,nextPlans=plans){if(cloud&&!cloud.canEdit()){toast('Aguarde a conexão ou resolva a atualização pendente antes de salvar.');return false;}if(storageFailed&&!force){toast('Restaure um backup antes de salvar: os dados antigos não puderam ser lidos.');return false;}try{if(cloud)cloud.enqueue({version:2,entries:next,plans:nextPlans});else localStorage.setItem(key,JSON.stringify({version:2,entries:next,plans:nextPlans}));entries=next;plans=nextPlans;storageFailed=false;render();return true;}catch{toast('Não foi possível salvar. Confira o estado da conexão e baixe um backup.');return false;}}
 const month=()=>$('#month').value;
 const displayMonth=()=>new Date(month()+'-15T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
 const dateText=s=>s.split('-').reverse().join('/');
@@ -49,4 +50,5 @@ async function restore(event){const file=event.target.files[0];if(!file)return;t
 const scheduleUI=createScheduleUI({getEntries:()=>entries,getPlans:()=>plans,save:persist,navigate,toast,openEntry:openForm,confirmAction,download});
 let lastScheduleDate='';function refreshSchedule(){const day=today();if(storageFailed)return;if(lastScheduleDate!==day){const expanded=extendSchedules(entries,plans,day);if(expanded.changed){if(persist(expanded.entries,false,expanded.plans))lastScheduleDate=day;}else{lastScheduleDate=day;render();}}}
 if(typeof window!=='undefined'){window.addEventListener('focus',refreshSchedule);setInterval(refreshSchedule,60000);}
-render();refreshSchedule();if(storageFailed)toast('Os dados salvos não puderam ser lidos. Não foram sobrescritos. Restaure um backup antes de adicionar registros.');
+if(typeof window!=='undefined')cloud=connectCloud({initial:{version:2,entries,plans},apply(state){entries=state.entries;plans=state.plans;storageFailed=false;lastScheduleDate='';render();queueMicrotask(refreshSchedule);},toast,confirmAction,download});
+render();if(!cloud)refreshSchedule();if(storageFailed)toast('Os dados salvos não puderam ser lidos. Não foram sobrescritos. Restaure um backup antes de adicionar registros.');

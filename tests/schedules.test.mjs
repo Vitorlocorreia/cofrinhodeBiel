@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {monthDate,extendSchedules,validatePlan,dueItems,reminderItems,stopSchedule,calendarFile} from '../dist/schedules.mjs';
+import {monthDate,extendSchedules,validatePlan,dueItems,reminderItems,stopSchedule,calendarFile} from '../web/schedules.mjs';
 const plan=(v={})=>({id:'plan1',kind:'parcelado',description:'Notebook',firstDate:'2026-01-31',category:'Educação',account:'Conta principal',amount:10001,startNumber:1,total:3,reminderDays:3,active:true,generated:0,...v});
 test('vencimentos no fim do mês mantêm a âncora e respeitam fevereiro e ano bissexto',()=>{assert.equal(monthDate('2026-01-31',1),'2026-02-28');assert.equal(monthDate('2026-01-31',2),'2026-03-31');assert.equal(monthDate('2024-01-31',1),'2024-02-29');assert.equal(monthDate('2026-12-31',1),'2027-01-31');});
 test('parcelamento gera apenas as parcelas restantes com centavos exatos',()=>{const result=extendSchedules([],[plan({startNumber:7,total:12})],'2026-01-15');assert.equal(result.entries.length,6);assert.equal(result.entries[0].installment,7);assert.equal(result.entries[5].installment,12);assert.equal(result.entries.reduce((s,e)=>s+e.amount,0),60006);assert.equal(result.entries[0].competence,'2026-01');assert.ok(result.entries.every(e=>e.status==='pendente'));});
