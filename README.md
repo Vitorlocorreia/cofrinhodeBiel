@@ -10,6 +10,28 @@ Aplicação financeira exclusiva do Gabriel, ligada ao projeto Supabase **Contro
 
 ## Acesso e banco
 
+## Publicar na Vercel
+
+O repositório inclui `vercel.json`, a preparação de arquivos estáticos `npm run build:vercel` e a função Node.js `api/cofre.mjs`. O build padrão do Sites produz um Worker e não deve ser usado como saída estática na Vercel.
+
+No projeto Vercel, use:
+
+- Framework Preset: **Other**.
+- Root Directory: **raiz do repositório** (sem `app`, pois o conteúdo dessa pasta foi enviado como raiz ao GitHub).
+- Build Command: `npm run build:vercel`.
+- Output Directory: `vercel-public`.
+
+Antes de ativar a conexão com o banco, configure **Settings → Deployment Protection → Vercel Authentication → All Deployments**. Verifique que o domínio de produção também exige o acesso do proprietário. Standard Protection protege apenas os endereços de prévia e não é suficiente para este histórico financeiro único. Não crie exceções públicas ou compartilhe links que ignorem essa proteção.
+
+Depois de conferir a proteção, configure no ambiente Vercel, como valores privados:
+
+- `COFRE_GATEWAY_TOKEN`: a mesma credencial privada de servidor já usada no Cofre. Nunca use uma variável com prefixo público e não publique esse valor no GitHub ou no chat.
+- `COFRE_PRIVATE_DEPLOYMENT`: `vercel-auth-all-deployments`. Este valor confirma a configuração de proteção; ele **não é autenticação por si só**. Só o habilite depois de verificar a proteção da plataforma. Sem ele, a função recusa a conexão com o banco.
+
+Faça um novo deploy após configurar as variáveis. O aplicativo usa o acesso da própria Vercel, sem cadastrar novos usuários no Cofre. Se o endereço continuar retornando HTTP 403 antes de exibir a interface, confira na conta proprietária os controles de acesso, as regras de firewall e os detalhes da implantação; o código da aplicação não pode remover uma restrição da hospedagem.
+
+## Histórico único e acesso privado
+
 Há um único histórico financeiro, sem Supabase Auth e sem cadastro de usuários. Em produção, o acesso usa a proteção privada já existente do Site. Não torne este Site público: o servidor compartilha um único histórico do Gabriel, e a proteção do Site é a fronteira de acesso da aplicação. O servidor local escuta apenas no endereço de loopback.
 
 O navegador chama `/api/cofre` no próprio endereço. O servidor autentica a chamada à função Supabase `cofre-gateway` com uma credencial privada. Apenas o hash SHA-256 dessa credencial fica no banco. A função usa os segredos administrativos fornecidos pelo próprio ambiente Supabase; eles nunca são enviados à interface.
