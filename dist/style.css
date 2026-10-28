@@ -29,3 +29,50 @@ nav{grid-template-columns:repeat(6,minmax(0,1fr))}nav button{font-size:9px}nav b
 @media(min-width:640px){.agenda-banner,.section-actions{flex-direction:row;align-items:center}.section-actions>.primary{width:auto}.commitment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.due-stats>div{padding:20px}.due-stats span{font-size:12px;min-height:0}.due-stats small{font-size:12px}.due-row{grid-template-columns:48px minmax(0,1fr) auto;gap:18px;align-items:center}.due-payment{grid-column:auto;flex-direction:column;align-items:end;gap:10px}}
 @media(min-width:1000px){nav{grid-template-columns:1fr}nav button{font-size:13px}nav button>.nav-text{font-size:13px}.commitment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.notification-button{width:40px;height:40px}.agenda-banner{padding:20px 24px}}
 @media(min-width:1000px){nav button.active{background:var(--accent-soft)}nav button.active .nav-icon{background:transparent}.theme-switch button{width:36px;min-height:36px}}
+
+/* A thumb-friendly floating dock, with secondary destinations in a bottom sheet. */
+.mobile-caption,.mobile-more{display:none}
+.nav-caption{width:auto!important;font:inherit;line-height:1.2!important}
+.nav-caption .desktop-caption{font:inherit}
+#title:focus{outline:none}
+.more-sheet{inset:auto 0 0;margin:0 auto;width:100%;max-width:540px;max-height:calc(100dvh - 36px);padding:12px 22px calc(20px + env(safe-area-inset-bottom));border:1px solid var(--border);border-bottom:0;border-radius:28px 28px 0 0;background:var(--panel);box-shadow:0 -12px 48px #12182018;overscroll-behavior:contain}
+.more-sheet[open]{animation:sheet-enter .22s cubic-bezier(.2,.8,.2,1)}
+.more-sheet::backdrop{background:rgb(15 18 22 / .32);backdrop-filter:blur(3px)}
+.sheet-handle{width:34px;height:4px;border-radius:8px;background:var(--border);margin:0 auto 24px}
+.sheet-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:21px}
+.sheet-heading .eyebrow{font-size:9px;margin-bottom:9px}.sheet-heading h2{font-size:22px;letter-spacing:-.5px;margin:0}
+.sheet-heading>button{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;padding:12px;border-radius:50%;color:var(--muted);background:var(--hover);border:0}
+.sheet-heading>button svg{width:18px;height:18px}
+.sheet-links{display:grid;gap:8px}.sheet-links>button{display:flex;align-items:center;gap:14px;width:100%;min-height:78px;padding:13px 12px;border:1px solid transparent;border-radius:16px;text-align:left;background:transparent;transition:background .18s,border-color .18s,transform .18s}
+.sheet-link-icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--border);background:var(--panel);border-radius:13px;color:var(--muted);flex-shrink:0}
+.sheet-link-icon svg{width:21px;height:21px}.sheet-link-copy{flex:1;min-width:0}.sheet-link-copy strong{display:block;font-size:13px;font-weight:600}.sheet-link-copy small{font-size:11px;line-height:1.6;margin-top:5px}.sheet-chevron{color:var(--muted)}.sheet-chevron svg{height:15px;width:15px}
+.sheet-links>button.active{background:var(--accent-soft);border-color:var(--accent-soft)}.sheet-links>button.active .sheet-link-icon{color:var(--accent-text);border-color:var(--accent);background:var(--panel)}.sheet-links>button:active{transform:scale(.985);background:var(--hover)}
+.sheet-footnote{font-size:10px;color:var(--muted);text-align:center;margin:26px 0 4px}
+html:has(.more-sheet[open]){overflow:hidden}
+@keyframes sheet-enter{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(max-width:999px){
+  main{padding-bottom:calc(130px + env(safe-area-inset-bottom))}
+  nav{inset:auto 12px calc(12px + env(safe-area-inset-bottom));width:auto;max-width:540px;margin:0 auto;padding:7px 5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;background:var(--panel);border:1px solid var(--border);border-radius:24px;box-shadow:0 8px 30px #18222e12,0 1px 3px #18222e08;isolation:isolate}
+  nav button[data-page=dre],nav button[data-page=excel]{display:none}
+  nav button.mobile-more{display:flex}
+  nav button .desktop-caption{display:none}
+  nav button .mobile-caption{display:inline}
+  nav button,nav button.mobile-more{position:relative;min-height:62px;min-width:0;gap:4px;padding:5px 0 8px;font-size:10px;font-weight:500;border:0;border-radius:17px;background:transparent;color:var(--muted);transform:none;-webkit-tap-highlight-color:transparent;transition:color .18s,background .18s}
+  nav button .nav-caption{font-size:10px!important;letter-spacing:-.15px;white-space:nowrap;position:relative;z-index:1}
+  nav button .nav-icon{position:relative;z-index:1;width:43px!important;min-height:30px;height:30px;border-radius:13px;background:transparent;transition:background .2s,transform .2s cubic-bezier(.2,.8,.2,1),color .2s}
+  nav button .nav-icon svg{width:21px;height:21px;stroke-width:1.7;transition:stroke-width .2s}
+  nav button.active,nav button[aria-expanded=true]{color:var(--accent-text);background:transparent;font-weight:700}
+  nav button.active .nav-icon,nav button[aria-expanded=true] .nav-icon{background:var(--accent-soft);color:var(--accent-text);transform:translateY(-1px)}
+  nav button.active .nav-icon svg{stroke-width:2}
+  nav button::before{content:'';position:absolute;bottom:2px;left:calc(50% - 2px);width:4px;height:4px;background:var(--accent-text);border-radius:50%;opacity:0;transform:scale(.4);transition:transform .2s,opacity .2s}
+  nav button.active::before{opacity:1;transform:scale(1)}
+  nav button::after{content:'';position:absolute;inset:2px;border-radius:15px;background:var(--accent-soft);opacity:0;transform:scale(.8);transition:opacity .16s,transform .16s;z-index:0}
+  nav button:active::after{opacity:1;transform:scale(1)}
+  nav button:active .nav-icon{transform:scale(.92)}
+  nav button:focus-visible{outline:2px solid var(--accent-text);outline-offset:1px;background:var(--hover)}
+  #toast{bottom:calc(106px + env(safe-area-inset-bottom))}
+}
+@media(max-width:359px){nav{left:9px;right:9px;padding-left:3px;padding-right:3px;border-radius:22px}nav button .nav-caption{font-size:9.5px!important}nav button .nav-icon{width:39px!important}}
+@media(hover:hover) and (pointer:fine){nav button:hover{background:var(--hover);color:var(--accent-text)}nav button:hover .nav-icon{transform:translateY(-2px)}.sheet-links>button:hover{background:var(--hover);border-color:var(--border)}.sheet-links>button:hover .sheet-chevron{color:var(--accent-text);transform:translateX(2px)}}
+@media(min-width:1000px){nav button.mobile-more{display:none}nav button .nav-caption{font-size:13px;line-height:1.4}nav button .nav-icon{transition:transform .18s}nav button.active{position:relative}nav button.active::before{content:'';position:absolute;width:3px;height:18px;left:0;top:calc(50% - 9px);border-radius:3px;background:var(--accent-text)}}
+@media(prefers-reduced-motion:reduce){.more-sheet[open]{animation:none}nav button,nav button .nav-icon,nav button::before,nav button::after,.sheet-links>button{transition:none}nav button:hover .nav-icon,nav button:active .nav-icon{transform:none}}
