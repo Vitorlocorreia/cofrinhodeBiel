@@ -1,0 +1,9 @@
+(()=>{
+const key='cofre-personalization-v1',defaults={space:'Meu espaço',accent:'blue',density:'comfortable',progress:true};
+let preferences={...defaults};try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved){if(typeof saved.space==='string')preferences.space=saved.space.slice(0,32);if(['blue','green','violet','sand'].includes(saved.accent))preferences.accent=saved.accent;if(['comfortable','compact'].includes(saved.density))preferences.density=saved.density;preferences.progress=saved.progress!==false;}}catch{}
+const form=document.querySelector('#personalize-form'),dialog=document.querySelector('#personalize-dialog');
+function apply(){document.documentElement.dataset.accent=preferences.accent;document.documentElement.dataset.density=preferences.density;document.documentElement.dataset.progress=String(preferences.progress);const label=document.querySelector('header>span');label.textContent=preferences.space||defaults.space;}
+function fill(){form.elements.space.value=preferences.space;form.elements.accent.value=preferences.accent;form.elements.density.value=preferences.density;form.elements.progress.checked=preferences.progress;}
+function save(next){try{localStorage.setItem(key,JSON.stringify(next));preferences=next;apply();dialog.close();}catch{document.querySelector('#personalize-error').textContent='Não foi possível salvar neste navegador.';}}
+document.querySelector('#personalize-open').onclick=()=>{fill();document.querySelector('#personalize-error').textContent='';dialog.showModal();};document.querySelector('#personalize-close').onclick=()=>dialog.close();document.querySelector('#personalize-reset').onclick=()=>save({...defaults});form.onsubmit=e=>{e.preventDefault();save({space:form.elements.space.value.trim()||defaults.space,accent:form.elements.accent.value,density:form.elements.density.value,progress:form.elements.progress.checked});};apply();
+})();
