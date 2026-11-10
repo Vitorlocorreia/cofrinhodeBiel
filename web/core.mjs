@@ -8,5 +8,14 @@ export function validate(e){if(e.dueDate!==undefined&&!validDate(e.dueDate))thro
 export const sign=e=>e.type==='receita'?1:e.type==='despesa'?-1:0;
 export function summary(entries,month,basis='date',paidOnly=true){const selected=entries.filter(e=>e[basis].startsWith(month)&&(!paidOnly||e.status==='pago'));const income=selected.filter(e=>e.type==='receita').reduce((s,e)=>s+e.amount,0),expense=selected.filter(e=>e.type==='despesa').reduce((s,e)=>s+e.amount,0);return {selected,income,expense,result:income-expense};}
 export function opening(entries,month){return entries.filter(e=>e.status==='pago'&&e.date<month+'-01').reduce((s,e)=>s+sign(e)*e.amount,0);}
+export function monthOverview(entries,month){
+  const actual=summary(entries,month),planned=summary(entries,month,'date',false);
+  const pending=planned.selected.filter(e=>e.status==='pendente');
+  const receivable=pending.filter(e=>e.type==='receita').reduce((s,e)=>s+e.amount,0);
+  const payable=pending.filter(e=>e.type==='despesa').reduce((s,e)=>s+e.amount,0);
+  const commitments=planned.selected.filter(e=>e.type==='despesa'&&e.planId).reduce((s,e)=>s+e.amount,0);
+  const balance=opening(entries,month)+actual.result;
+  return {actual,planned,pending,receivable,payable,commitments,balance,projected:balance+receivable-payable};
+}
 export const fingerprint=e=>JSON.stringify([e.date,e.competence,e.description.trim().toLocaleLowerCase('pt-BR'),e.type,e.category,e.amount,e.status,e.account,e.destination||'']);
 export function mergeImport(existing,incoming){const seen=new Set(existing.map(fingerprint)),ids=new Set(existing.map(e=>e.id));const added=[];let duplicates=0;for(const e of incoming){validate(e);if(seen.has(fingerprint(e))){duplicates++;continue;}if(ids.has(e.id))throw Error('Um ID já existe com dados diferentes. Revise a planilha antes de importar.');seen.add(fingerprint(e));ids.add(e.id);added.push(e);}return {entries:[...existing,...added],added:added.length,duplicates};}
