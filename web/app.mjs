@@ -65,4 +65,4 @@ if(typeof window!=='undefined'&&!isDemo)cloud=connectCloud({initial:{version:2,e
 if(isDemo){document.title='Meu Espaço · Demonstração';$('#cloud-status').className='demo-banner';$('#cloud-status').innerHTML='<div><strong>Demonstração</strong><span>Dados fictícios. Explore à vontade; alterações somem ao recarregar.</span></div><div class="demo-tools"><button id="open-demo-tour" type="button">Tutorial</button><button id="reset-demo" type="button">Recomeçar</button></div>';$('#reset-demo').onclick=()=>location.reload();}
 render();if(!cloud)refreshSchedule();if(storageFailed)toast('Os dados salvos não puderam ser lidos. Não foram sobrescritos. Restaure um backup antes de adicionar registros.');
 
-if(isDemo)initDemoTour({navigate,showHome(tab){homeTab=tab;navigate('overview');}});
+if(isDemo)initDemoTour({navigate,getPage:()=>page==='overview'&&homeTab==='analysis'?'analysis':page,showHome(tab){homeTab=tab;navigate('overview');}});
