@@ -1,3 +1,4 @@
+import {initDemoTour} from './demo-tour.mjs';
 import {createDemo} from './demo.mjs';
 import {icon} from './icons.mjs';
 import {categories,accounts,today,money,cents,validate,summary,opening,sign,mergeImport,monthOverview} from './core.mjs';
@@ -61,5 +62,7 @@ const scheduleUI=createScheduleUI({getEntries:()=>entries,getPlans:()=>plans,sav
 let lastScheduleDate='';function refreshSchedule(){const day=today();if(storageFailed)return;if(lastScheduleDate!==day){const expanded=extendSchedules(entries,plans,day);if(expanded.changed){if(persist(expanded.entries,false,expanded.plans))lastScheduleDate=day;}else{lastScheduleDate=day;render();}}}
 if(typeof window!=='undefined'){window.addEventListener('focus',refreshSchedule);setInterval(refreshSchedule,60000);}
 if(typeof window!=='undefined'&&!isDemo)cloud=connectCloud({initial:{version:2,entries,plans},apply(state){entries=state.entries;plans=state.plans;storageFailed=false;lastScheduleDate='';render();queueMicrotask(refreshSchedule);},toast,confirmAction,download});
-if(isDemo){document.title='Meu Espaço · Demonstração';$('#cloud-status').className='demo-banner';$('#cloud-status').innerHTML='<div><strong>Demonstração</strong><span>Dados fictícios. Explore à vontade; alterações somem ao recarregar.</span></div><button id="reset-demo" type="button">Recomeçar</button>';$('#reset-demo').onclick=()=>location.reload();}
+if(isDemo){document.title='Meu Espaço · Demonstração';$('#cloud-status').className='demo-banner';$('#cloud-status').innerHTML='<div><strong>Demonstração</strong><span>Dados fictícios. Explore à vontade; alterações somem ao recarregar.</span></div><div class="demo-tools"><button id="open-demo-tour" type="button">Tutorial</button><button id="reset-demo" type="button">Recomeçar</button></div>';$('#reset-demo').onclick=()=>location.reload();}
 render();if(!cloud)refreshSchedule();if(storageFailed)toast('Os dados salvos não puderam ser lidos. Não foram sobrescritos. Restaure um backup antes de adicionar registros.');
+
+if(isDemo)initDemoTour({navigate,showHome(tab){homeTab=tab;navigate('overview');}});
